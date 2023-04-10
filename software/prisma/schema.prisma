@@ -1,0 +1,27 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Bot {
+  id        String @id @default(uuid())
+  token     String
+  client_id String
+}
+
+model DMChannels {
+  id            String    @id @default(uuid())
+  username      String
+  discriminator String
+  user_id       String    @unique
+  status        Boolean   @default(false)
+  created_at    DateTime  @default(now())
+  updated_at    DateTime?
+}

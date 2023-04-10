@@ -1,0 +1,259 @@
+.home {
+    width: 100%;
+    height: 100vh;
+    display: grid;
+    grid-template-columns: auto 1fr;
+
+    .btn {
+        width: 100%;
+        padding: 1rem;
+        background: $color-slate-950;
+        border-radius: 4px;
+        color: $color-blue-100;
+        cursor: pointer;
+        transition: all ease-out 0.2s;
+
+        &:not(.btn--disable):hover {
+            background: $color-slate-700;
+        }
+
+        &-active {
+            @extend .btn;
+
+            background: $color-blue-950;
+            &:hover {
+                background: $color-blue-900;
+            }
+        }
+
+        &-primary {
+            @extend .btn;
+            background: $color-gray-950;
+            font-size: 0.9rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05rem;
+            line-height: calc(1rem * 1.3);
+
+            &:not(.btn--disable):hover {
+                background: $color-gray-800;
+            }
+
+            &.margin {
+                margin-bottom: 0.5rem;
+            }
+        }
+
+        &-error {
+            @extend .btn-primary;
+            background: #991b1b4d;
+            color: #fee2e2;
+            width: auto;
+
+            &:not(.btn--disable):hover {
+                background: $color-red-700;
+            }
+        }
+
+        &-success {
+            @extend .btn-primary;
+            background: #1665344d;
+            color: #dcfce7;
+            width: auto;
+
+            &:not(.btn--disable):hover {
+                background: $color-green-700;
+            }
+        }
+
+        &-warning {
+            @extend .btn-primary;
+            background: #a162074d;
+            color: #fef9c3;
+            width: auto;
+
+            &:not(.btn--disable):hover {
+                background: $color-yellow-700;
+            }
+        }
+
+        &--disable {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+    }
+
+    aside {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: flex-start;
+        gap: 0.5rem;
+        background: $color-slate-900;
+        padding: 0.5rem;
+
+        div {
+            width: 100%;
+        }
+    }
+
+    &-content {
+        width: 100%;
+        height: 100%;
+        position: relative;
+        display: grid;
+        grid-template-rows: 1fr 80px;
+        overflow: hidden;
+
+        .btn-container {
+            width: 100%;
+            height: auto;
+            position: absolute;
+            top: 0;
+            right: 0;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 0.5rem;
+            padding: 1rem;
+            background: linear-gradient(90deg, $color-slate-950 0%, $color-gray-950 100%);
+
+            &--hidden {
+                display: none;
+                visibility: hidden;
+                opacity: 0;
+            }
+        }
+
+        .messages {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            justify-content: flex-start;
+            gap: 1rem;
+            padding: 6rem 2rem 2rem;
+            background: $color-gray-950;
+            overflow-y: auto;
+
+            &::-webkit-scrollbar {
+                width: 5px;
+                height: 3px;
+            }
+
+            &::-webkit-scrollbar-thumb {
+                background: $color-blue-950;
+                border-radius: 4px;
+            }
+
+            &::-webkit-scrollbar-track {
+                background: $color-slate-950;
+            }
+
+            .message {
+                display: flex;
+                flex-direction: column;
+                align-items: flex-start;
+                justify-content: center;
+                gap: 0.5rem;
+                background: $color-gray-900;
+                border-radius: 4px;
+                padding: 0.5rem 1.5rem;
+                box-shadow: 0 3px 4px 0 #1118273a;
+
+                &.right {
+                    align-self: flex-end;
+
+                    .user {
+                        align-self: flex-end;
+                    }
+
+                    .content {
+                        margin: 0;
+                        margin-right: 0.25rem;
+                    }
+
+                    span {
+                        align-self: flex-end;
+                    }
+                }
+
+                .user {
+                    color: $color-blue-800;
+                    font-family: sans-serif;
+                    font-size: 0.9rem;
+                }
+
+                .content {
+                    margin-left: 0.25rem;
+                    color: $color-blue-100;
+                    font-size: 1.3rem;
+                    font-family: sans-serif;
+                }
+
+                span {
+                    color: $color-blue-800;
+                    font-family: sans-serif;
+                    font-size: 0.5rem;
+                }
+            }
+        }
+
+        .footer {
+            display: grid;
+            grid-template-columns: 1fr 120px;
+            gap: 0.5rem;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, $color-slate-950 0%, $color-gray-950 100%);
+            border-top: 1px solid $color-gray-700;
+            padding: 1rem;
+
+            input {
+                width: 100%;
+                height: 100%;
+                padding: 0.5rem 2rem;
+                color: $color-blue-100;
+                font-size: 1rem;
+                background: #37415144;
+                border-radius: 4px;
+            }
+        }
+    }
+
+    &-container {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        background: $color-gray-950;
+
+        h1 {
+            font-family: sans-serif;
+            font-size: 1.5rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            text-shadow: 0 1px 4px #cbd5e15d;
+            letter-spacing: 0.1rem;
+            line-height: calc(1.3 * 1.5rem);
+            color: $color-slate-300;
+            user-select: none;
+        }
+
+        p {
+            font-family: sans-serif;
+            font-size: 1rem;
+            font-weight: 500;
+            text-transform: uppercase;
+            text-shadow: 0 1px 4px #60a5fa5d;
+            letter-spacing: 0.1rem;
+            line-height: calc(1.4 * 1rem);
+            color: $color-blue-400;
+            user-select: none;
+        }
+    }
+}
