@@ -15,7 +15,8 @@ server.get("/fecth-bot", (req, res) => {
     }
 
     const username = client.user.username;
-    res.status(200).json({ bot_username: username });
+    const user_id = client.user.id;
+    res.status(200).json({ bot_username: username, user_id });
 });
 
 server.get("/fetch-rooms", async (req, res) => {

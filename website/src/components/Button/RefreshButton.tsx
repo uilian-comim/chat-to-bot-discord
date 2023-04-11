@@ -10,10 +10,8 @@ export default function RefreshButton() {
             type="button"
             className="btn-primary margin"
             onClick={async () => {
-                console.log(currentRoom);
                 Loading.circle("Atualizando...");
-                Loading.remove(2000);
-                const response = await fetchRooms();
+                const response = await fetchRooms().finally(() => Loading.remove());
                 if (response.status === 200) {
                     Notify.success(response.data.success);
                     const { fullRooms } = response.data;

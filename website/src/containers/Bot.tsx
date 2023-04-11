@@ -6,6 +6,7 @@ import { useEffect, useMemo, useState } from "react";
 
 export default function BotProvider({ children }: ContainerProps) {
     const [username, setUsername] = useState<string | null>(null);
+    const [id, setId] = useState<string | null>(null);
     const [isFetching, setFetching] = useState(true);
 
     useEffect(() => {
@@ -18,7 +19,7 @@ export default function BotProvider({ children }: ContainerProps) {
                 fontFamily: "Quicksand",
                 cssAnimation: true,
                 cssAnimationDuration: 400,
-                clickToClose: true,
+                clickToClose: false,
                 customSvgUrl: null,
                 customSvgCode: null,
                 svgSize: "80px",
@@ -31,7 +32,6 @@ export default function BotProvider({ children }: ContainerProps) {
 
             Loading.pulse("Conectando...");
         }
-        Loading.remove(1000);
     }, [isFetching]);
 
     useEffect(() => {
@@ -41,16 +41,20 @@ export default function BotProvider({ children }: ContainerProps) {
                 axios
                     .get("http://localhost:3333/fecth-bot")
                     .then((res) => {
-                        const { bot_username } = res.data;
+                        const { bot_username, user_id } = res.data;
                         setUsername(bot_username);
+                        setId(user_id);
                     })
                     .catch((err) => console.log(err))
-                    .finally(() => setFetching(false));
+                    .finally(() => {
+                        Loading.remove();
+                        setFetching(false);
+                    });
             }, 5000);
         }
     }, [isFetching]);
 
-    const value = useMemo(() => ({ username }), [username]);
+    const value = useMemo(() => ({ username, id }), [username, id]);
 
     return <BotContext.Provider value={value}>{children}</BotContext.Provider>;
 }

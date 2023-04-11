@@ -20,13 +20,37 @@ export class SocketServer {
 
             socket.on("change-room", (room_name) => {
                 console.log(`O usuário ${socket.id} entrou na sala ${room_name}`);
+                prisma.dMChannels
+                    .findFirst({
+                        where: {
+                            id: room_name,
+                        },
+                    })
+                    .then(async (res) => {
+                        if (res) {
+                            const user = await client.users.fetch(res.user_id);
+                            if (user) {
+                                if (user.dmChannel) {
+                                    const messages = await user.dmChannel.messages.fetch({
+                                        limit: 15,
+                                    });
+
+                                    const reverseMessages = [...messages].reverse();
+
+                                    socket.emit("load messages", {
+                                        messages: messages.reverse(),
+                                    });
+                                }
+                            }
+                        }
+                    });
                 socket.join(room_name);
             });
 
-            socket.on("join-room", (room_name) => {
-                socket.join(room_name);
-                console.log(`O usuário ${socket.id} se conectou com sucesso a sala ${room_name}`);
-            });
+            // socket.on("join-room", (room_name) => {
+            //     socket.join(room_name);
+            //     console.log(`O usuário ${socket.id} se conectou com sucesso a sala ${room_name}`);
+            // });
 
             socket.on("message", (props) => {
                 prisma.dMChannels

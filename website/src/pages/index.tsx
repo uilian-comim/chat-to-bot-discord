@@ -2,6 +2,7 @@ import Aside from "@/components/Aside";
 import { useBot, useSocket } from "@/contexts";
 import { deleteRoom, disableRoom, enableRoom, fetchRooms } from "@/services";
 import { updateDOM } from "@/utils";
+import { format } from "date-fns";
 import Head from "next/head";
 import { Confirm, Notify } from "notiflix";
 import { FormEvent, useEffect, useRef, useState } from "react";
@@ -11,18 +12,19 @@ export default function Home() {
     const [inputValue, setInputValue] = useState<string>();
     const messagesComponent = useRef<HTMLDivElement | null>(null);
     const input = useRef<HTMLInputElement | null>(null);
-    const { rooms, setCurrentRoom, setRooms, SendMessage, message, date, currentUsername, currentRoom } = useSocket();
-    const { username } = useBot();
+    const { messages, rooms, setCurrentRoom, setRooms, SendMessage, message, date, currentUsername, currentRoom } =
+        useSocket();
+    const { username, id } = useBot();
+
+    useEffect(() => {
+        if (messagesComponent.current) {
+            messagesComponent.current.scrollTo(0, document.body.scrollHeight);
+        }
+    }, [messages]);
 
     useEffect(() => {
         updateDOM({ currentUsername, date, input, inputValue, localhost: false, message, messagesComponent, username });
     }, [message, date, currentUsername]);
-
-    useEffect(() => {
-        if (messagesComponent.current) {
-            messagesComponent.current.innerHTML = "";
-        }
-    }, [currentRoom]);
 
     function onSubmit(event: FormEvent<HTMLFormElement>) {
         event.preventDefault();
@@ -138,7 +140,29 @@ export default function Home() {
                             </button>
                         </div>
                     ))}
-                    <div className="messages" ref={messagesComponent}></div>
+
+                    <div className="messages" ref={messagesComponent}>
+                        {messages &&
+                            messages.map((msg) => {
+                                if (msg.authorId === id) {
+                                    return (
+                                        <div className="message" key={uuidv4()}>
+                                            <div className="user">{username}</div>
+                                            <div className="content">{msg.content}</div>
+                                            <span>{format(msg.createdTimestamp, "dd/MM/yyyy HH:mm:ss")}</span>
+                                        </div>
+                                    );
+                                } else {
+                                    return (
+                                        <div className="message right" key={uuidv4()}>
+                                            <div className="user">{currentUsername}</div>
+                                            <div className="content">{msg.content}</div>
+                                            <span>{format(msg.createdTimestamp, "dd/MM/yyyy HH:mm:ss")}</span>
+                                        </div>
+                                    );
+                                }
+                            })}
+                    </div>
                     <form className="footer" onSubmit={(e) => onSubmit(e)}>
                         <input
                             placeholder="Digite a mensagem que deseja enviar"

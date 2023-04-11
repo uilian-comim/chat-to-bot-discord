@@ -14,7 +14,7 @@ yarn | npm install
 
 👤 **Uilian Comim**
 
--   Github: [@uilian-comim](https://github.com/uilian-comim)
+-   Github: [@Uilian Comim](https://github.com/uilian-comim)
 -   LinkedIn: [@Uilian Comim](https://linkedin.com/in/uilian-comim)
 
 ## Show your support

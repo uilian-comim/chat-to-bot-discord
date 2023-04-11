@@ -2,10 +2,12 @@ import { createContext, useContext } from "react";
 
 interface IBotContext {
     username: string | null;
+    id: string | null;
 }
 
 export const BotContext = createContext<IBotContext>({
     username: null,
+    id: null,
 });
 
 export function useBot() {

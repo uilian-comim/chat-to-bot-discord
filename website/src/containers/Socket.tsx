@@ -1,5 +1,5 @@
 import { SocketContext } from "@/contexts";
-import { ContainerProps, IRoom, ISendMessage } from "@/interfaces";
+import { ContainerProps, IMessages, IRoom, ISendMessage } from "@/interfaces";
 import { fetchRooms } from "@/services";
 import { useEffect, useMemo, useState } from "react";
 import { io } from "socket.io-client";
@@ -11,6 +11,7 @@ export default function SocketProvider({ children }: ContainerProps) {
     const [currentUsername, setUsername] = useState<string | null>(null);
     const [rooms, SetRooms] = useState<Array<IRoom>>([]);
     const [currentRoom, setRoom] = useState<IRoom | null>(null);
+    const [messages, setMessages] = useState<Array<IMessages> | null>(null);
 
     useEffect(() => {
         fetchRooms().then((response) => {
@@ -30,22 +31,19 @@ export default function SocketProvider({ children }: ContainerProps) {
         }
     }, [currentRoom]);
 
-    socket.on("connect", () => {
-        console.log("usuário conectado com sucesso.");
-        console.log(`Socket id: ${socket.id}`);
+    // socket.on("connect", () => {});
+
+    socket.on("load messages", (props) => {
+        const { messages, user } = props;
+        setMessages(messages);
     });
 
     socket.on("message", (props) => {
-        console.log(props);
         setMessage(props.message);
         setDate(props.created_at);
-        setUsername(props.username);
     });
 
-    socket.on("disconnect", (props) => {
-        console.log("usuário desconectado.");
-        console.log(`Props: ${props}`);
-    });
+    // socket.on("disconnect", (props) => {});
 
     function SendMessage(props: ISendMessage) {
         if (currentRoom) {
@@ -54,6 +52,8 @@ export default function SocketProvider({ children }: ContainerProps) {
     }
 
     function setCurrentRoom(props: IRoom) {
+        setMessages(null);
+        setUsername(props.username);
         setRoom(props);
     }
 
@@ -62,8 +62,8 @@ export default function SocketProvider({ children }: ContainerProps) {
     }
 
     const value = useMemo(
-        () => ({ SendMessage, setCurrentRoom, setRooms, message, date, currentUsername, rooms, currentRoom }),
-        [message, date, currentUsername, rooms, currentRoom]
+        () => ({ SendMessage, setCurrentRoom, setRooms, message, messages, date, currentUsername, rooms, currentRoom }),
+        [message, date, currentUsername, rooms, currentRoom, messages]
     );
 
     return <SocketContext.Provider value={value}>{children}</SocketContext.Provider>;

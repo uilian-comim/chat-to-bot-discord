@@ -1,10 +1,11 @@
-import { IRoom, ISendMessage } from "@/interfaces";
+import { IMessages, IRoom, ISendMessage } from "@/interfaces";
 import { createContext, useContext } from "react";
 
 interface ISocketContext {
     SendMessage: (props: ISendMessage) => void;
     setCurrentRoom: (props: IRoom) => void;
     setRooms: (props: Array<IRoom>) => void;
+    messages: Array<IMessages> | null;
     message: string | null;
     date: string | null;
     currentUsername: string | null;
@@ -16,6 +17,7 @@ export const SocketContext = createContext<ISocketContext>({
     SendMessage: (props: ISendMessage) => {},
     setRooms: (props: Array<IRoom>) => {},
     setCurrentRoom: (props: IRoom) => {},
+    messages: null,
     message: null,
     date: null,
     currentUsername: null,
