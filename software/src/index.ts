@@ -1,5 +1,4 @@
 import { httpServer } from "api";
-import { format } from "date-fns";
 import prisma from "db";
 import { Client, Events, GatewayIntentBits } from "discord.js";
 import { SocketServer } from "socket";
@@ -47,13 +46,18 @@ client.on("messageCreate", (message) => {
                 },
             })
             .then((user) => {
-                if (!user) {
+                if (!user || !user.status) {
                     return;
                 } else {
+                    const msg = {
+                        author_id: message.author.id,
+                        author_name: message.author.username,
+                        content: message.content,
+                        created_at: message.createdTimestamp,
+                    };
+
                     socketServer.io.to(user.id).emit("message", {
-                        message: message.content,
-                        username: user.username,
-                        created_at: format(message.createdAt, "dd/MM/yyyy HH:mm:ss"),
+                        message: msg,
                     });
                 }
             });

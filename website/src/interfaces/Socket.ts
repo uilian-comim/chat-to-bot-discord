@@ -10,10 +10,11 @@ interface IRoom {
     discriminator: string;
 }
 
-interface IMessages {
-    authorId: string;
+interface IMessage {
     content: string;
-    createdTimestamp: number;
+    created_at: number;
+    author_id: string;
+    author_name: string;
 }
 
-export type { IMessages, IRoom, ISendMessage };
+export type { IMessage, IRoom, ISendMessage };

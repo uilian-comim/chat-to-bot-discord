@@ -3,7 +3,7 @@ import { createRoom, fetchRooms } from "@/services";
 import { Confirm, Notify } from "notiflix";
 
 export default function AddButton() {
-    const { setCurrentRoom, setRooms, rooms } = useSocket();
+    const { setRooms } = useSocket();
 
     return (
         <button
@@ -21,11 +21,8 @@ export default function AddButton() {
                         if (response.status === 200) {
                             Notify.success(response.data.success);
                             const res = await fetchRooms();
-                            const { fullRooms } = res.data;
-                            setRooms(fullRooms);
-                            if (rooms.length > 0) {
-                                setCurrentRoom(rooms[0]);
-                            }
+                            const { allRooms } = res.data;
+                            setRooms(allRooms);
                         } else {
                             Notify.failure(response.data.error);
                         }

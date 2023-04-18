@@ -30,7 +30,7 @@ server.get("/fetch-rooms", async (req, res) => {
             },
         });
 
-        res.status(200).json({ fullRooms: dmChannels });
+        res.status(200).json({ allRooms: dmChannels });
     } catch (err) {
         console.log(err);
         return res.status(500).json({ error: "Erro interno no servidor." });
@@ -102,6 +102,37 @@ server.delete("/delete-room", async (req, res) => {
     }
 });
 
+server.put("/enable-room", async (req, res) => {
+    try {
+        const { room_id } = req.body;
+        const finded = await prisma.dMChannels.findFirst({
+            where: {
+                id: room_id,
+            },
+        });
+
+        if (!finded) return res.status(404).json({ error: "Canal não encontrado." });
+
+        await prisma.dMChannels.update({
+            data: {
+                status: true,
+            },
+            where: {
+                id: room_id,
+            },
+        });
+
+        return res.status(200).json({
+            success: `Canal privado com o usuário ${finded.username}#${finded.discriminator} aberto com sucesso.`,
+        });
+    } catch (err) {
+        console.log(err);
+        return res.status(500).json({ error: "Erro desconhecido." });
+    } finally {
+        await prisma.$disconnect();
+    }
+});
+
 server.put("/disable-room", async (req, res) => {
     try {
         const { room_id } = req.body;
@@ -116,10 +147,6 @@ server.put("/disable-room", async (req, res) => {
 
         if (!finded) return res.status(404).send("Canal não encontrado.");
 
-        const user = await client.users.fetch(finded.user_id);
-
-        await user.deleteDM();
-
         await prisma.dMChannels.update({
             data: {
                 status: false,
@@ -129,40 +156,9 @@ server.put("/disable-room", async (req, res) => {
             },
         });
 
-        return res.status(200).json({ success: `Canal privado com o usuário ${user.tag} fechado com sucesso!` });
-    } catch (err) {
-        console.log(err);
-        return res.status(500).json({ error: "Erro desconhecido." });
-    } finally {
-        await prisma.$disconnect();
-    }
-});
-
-server.put("/enable-room", async (req, res) => {
-    try {
-        const { room_id } = req.body;
-        const finded = await prisma.dMChannels.findFirst({
-            where: {
-                id: room_id,
-            },
+        return res.status(200).json({
+            success: `Canal privado com o usuário ${finded.username}#${finded.discriminator} fechado com sucesso!`,
         });
-
-        if (!finded) return res.status(404).json({ error: "Canal não encontrado." });
-
-        const user = await client.users.fetch(finded.user_id);
-
-        await user.createDM();
-
-        await prisma.dMChannels.update({
-            data: {
-                status: true,
-            },
-            where: {
-                id: room_id,
-            },
-        });
-
-        return res.status(200).json({ success: `Canal privado com o usuário ${user.tag} aberto com sucesso.` });
     } catch (err) {
         console.log(err);
         return res.status(500).json({ error: "Erro desconhecido." });

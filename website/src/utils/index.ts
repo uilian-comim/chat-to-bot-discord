@@ -1,71 +1,59 @@
+import { IMessage } from "@/interfaces";
 import { format } from "date-fns";
 import { MutableRefObject } from "react";
 
 interface IUpdateDOM {
     localhost: boolean;
-    inputValue: string | undefined;
     messagesComponent: MutableRefObject<HTMLDivElement | null>;
     input: MutableRefObject<HTMLInputElement | null>;
-    message: string | null;
-    date: string | null;
-    username: string | null;
-    currentUsername: string | null;
+    message: IMessage | null;
+    username?: string | null;
 }
 
-function updateDOM({
-    username,
-    currentUsername,
-    input,
-    inputValue,
-    localhost,
-    message,
-    messagesComponent,
-    date,
-}: IUpdateDOM) {
+function updateDOM({ input, localhost, message, messagesComponent, username }: IUpdateDOM) {
     if (localhost) {
-        if (!inputValue || !messagesComponent.current || !input.current) return;
-        const userElement = document.createElement("div");
-        const messageElement = document.createElement("div");
-        const contentElement = document.createElement("div");
-        const dateElement = document.createElement("span");
+        if (!messagesComponent.current || !input.current || !username) return;
+        const MessageContainer = document.createElement("div");
+        const UserElement = document.createElement("p");
+        const MessageElement = document.createElement("p");
+        const DateElement = document.createElement("span");
 
-        userElement.textContent = username;
-        contentElement.textContent = inputValue;
-        dateElement.textContent = format(new Date(), "dd/MM/yyyy HH:mm:ss");
+        UserElement.textContent = username;
+        MessageElement.textContent = input.current.value;
+        DateElement.textContent = format(new Date(), "dd/MM/yyyy HH:mm:ss");
 
-        userElement.setAttribute("class", "user");
-        contentElement.setAttribute("class", "content");
-        messageElement.setAttribute("class", "message");
+        MessageContainer.setAttribute("class", "message-container");
+        UserElement.setAttribute("class", "username");
+        MessageElement.setAttribute("class", "message");
 
-        messageElement.appendChild(userElement);
-        messageElement.appendChild(contentElement);
-        messageElement.appendChild(dateElement);
+        MessageContainer.appendChild(UserElement);
+        MessageContainer.appendChild(MessageElement);
+        MessageContainer.appendChild(DateElement);
 
-        messagesComponent.current.appendChild(messageElement);
+        messagesComponent.current.appendChild(MessageContainer);
         messagesComponent.current.scrollTo(0, document.body.scrollHeight);
         input.current.value = "";
     } else {
-        if (!messagesComponent.current || !input.current || !message || !date) return;
+        if (!messagesComponent.current || !message) return;
 
-        const userElement = document.createElement("div");
-        const messageElement = document.createElement("div");
-        const contentElement = document.createElement("div");
-        const dateElement = document.createElement("span");
-        userElement.textContent = currentUsername;
-        contentElement.textContent = message;
-        dateElement.textContent = date;
+        const MessageContainer = document.createElement("div");
+        const UserElement = document.createElement("p");
+        const MessageElement = document.createElement("p");
+        const DateElement = document.createElement("span");
+        UserElement.textContent = message.author_name;
+        MessageElement.textContent = message.content;
+        DateElement.textContent = format(message.created_at, "dd/MM/yyyy HH:mm:ss");
 
-        userElement.setAttribute("class", "user");
-        contentElement.setAttribute("class", "content");
-        messageElement.setAttribute("class", "message right");
+        MessageContainer.setAttribute("class", "message-container right");
+        UserElement.setAttribute("class", "username");
+        MessageElement.setAttribute("class", "message");
 
-        messageElement.appendChild(userElement);
-        messageElement.appendChild(contentElement);
-        messageElement.appendChild(dateElement);
+        MessageContainer.appendChild(UserElement);
+        MessageContainer.appendChild(MessageElement);
+        MessageContainer.appendChild(DateElement);
 
-        messagesComponent.current.appendChild(messageElement);
+        messagesComponent.current.appendChild(MessageContainer);
         messagesComponent.current.scrollTo(0, document.body.scrollHeight);
-        input.current.value = "";
     }
 }
 export { updateDOM };

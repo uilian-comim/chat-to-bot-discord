@@ -1,30 +1,34 @@
 import Aside from "@/components/Aside";
-import { useBot, useSocket } from "@/contexts";
-import { deleteRoom, disableRoom, enableRoom, fetchRooms } from "@/services";
+import RoomButtons from "@/components/Room";
+import { useBot, useComponentsRef, useSocket } from "@/contexts";
+import { IRoom } from "@/interfaces";
+import { fetchRooms } from "@/services";
 import { updateDOM } from "@/utils";
 import { format } from "date-fns";
+import { GetServerSideProps } from "next";
 import Head from "next/head";
-import { Confirm, Notify } from "notiflix";
-import { FormEvent, useEffect, useRef, useState } from "react";
+import { Notify } from "notiflix";
+import { FormEvent, useEffect } from "react";
 import { v4 as uuidv4 } from "uuid";
 
-export default function Home() {
-    const [inputValue, setInputValue] = useState<string>();
-    const messagesComponent = useRef<HTMLDivElement | null>(null);
-    const input = useRef<HTMLInputElement | null>(null);
-    const { messages, rooms, setCurrentRoom, setRooms, SendMessage, message, date, currentUsername, currentRoom } =
-        useSocket();
+interface HomeProps {
+    allRooms: Array<IRoom>;
+}
+
+export default function Home({ allRooms }: HomeProps) {
+    const { ElementInput, ElementMessages } = useComponentsRef();
+    const { setRooms, SendMessage, messages, rooms, message, currentRoom } = useSocket();
     const { username, id } = useBot();
 
     useEffect(() => {
-        if (messagesComponent.current) {
-            messagesComponent.current.scrollTo(0, document.body.scrollHeight);
-        }
-    }, [messages]);
+        setRooms(allRooms);
+    }, []);
 
     useEffect(() => {
-        updateDOM({ currentUsername, date, input, inputValue, localhost: false, message, messagesComponent, username });
-    }, [message, date, currentUsername]);
+        Notify.init({
+            clickToClose: true,
+        });
+    }, []);
 
     function onSubmit(event: FormEvent<HTMLFormElement>) {
         event.preventDefault();
@@ -33,17 +37,12 @@ export default function Home() {
             return;
         }
 
-        if (!inputValue) return;
+        if (!ElementInput.current || (ElementInput.current && !ElementInput.current.value)) return;
 
-        updateDOM({ localhost: true, currentUsername, date, input, inputValue, message, messagesComponent, username });
-        SendMessage({ message: inputValue, username: username });
+        const msg = ElementInput.current.value;
+        updateDOM({ localhost: true, input: ElementInput, message, messagesComponent: ElementMessages, username });
+        SendMessage({ message: msg, username: username });
     }
-
-    useEffect(() => {
-        Notify.init({
-            clickToClose: true,
-        });
-    }, []);
 
     return (
         <div className="home">
@@ -53,111 +52,24 @@ export default function Home() {
             <Aside />
             {currentRoom ? (
                 <div className="home-content">
-                    {rooms.map((room) => (
-                        <div
-                            key={uuidv4()}
-                            className={
-                                currentRoom && currentRoom.id === room.id ? "btn-container" : "btn-container--hidden"
-                            }
-                        >
-                            <button
-                                type="button"
-                                className="btn-warning"
-                                onClick={async () => {
-                                    Confirm.show(
-                                        `Deletar`,
-                                        `Deseja mesmo deletar o canal aberto com o usuário:${room.username}#${room.discriminator}`,
-                                        "Confirmar",
-                                        "Cancelar",
-                                        async () => {
-                                            const response = await deleteRoom(room.id);
-                                            if (response.status === 200) {
-                                                const newData = await fetchRooms();
-                                                const { fullRooms } = newData.data;
-                                                setRooms(fullRooms);
-                                                fullRooms.map((room) => {
-                                                    if (room.id === currentRoom?.id) {
-                                                        setCurrentRoom(room);
-                                                    }
-                                                });
-                                                Notify.success(response.data.success);
-                                            } else {
-                                                Notify.failure(response.data.error);
-                                            }
-                                        }
-                                    );
-                                }}
-                            >
-                                Deletar
-                            </button>
-                            <button
-                                type="button"
-                                className={room.status ? "btn-error" : "btn-error btn--disable"}
-                                onClick={async () => {
-                                    if (room.status === true) {
-                                        const response = await disableRoom(room.id);
-                                        if (response.status === 200) {
-                                            const newData = await fetchRooms();
-                                            const { fullRooms } = newData.data;
-                                            setRooms(fullRooms);
-                                            rooms.map((room) => {
-                                                if (room.id === currentRoom?.id) {
-                                                    setCurrentRoom(room);
-                                                }
-                                            });
-                                            Notify.success(response.data.success);
-                                        } else {
-                                            Notify.failure(response.data.error);
-                                        }
-                                    }
-                                }}
-                            >
-                                Desabilitar
-                            </button>
-                            <button
-                                type="button"
-                                className={!room.status ? "btn-success" : "btn-success btn--disable"}
-                                onClick={async () => {
-                                    if (room.status === false) {
-                                        const response = await enableRoom(room.id);
-                                        if (response.status === 200) {
-                                            const newData = await fetchRooms();
-                                            const { fullRooms } = newData.data;
-                                            setRooms(fullRooms);
-                                            rooms.map((room) => {
-                                                if (room.id === currentRoom?.id) {
-                                                    setCurrentRoom(room);
-                                                }
-                                            });
-                                            Notify.success(response.data.success);
-                                        } else {
-                                            Notify.failure(response.data.error);
-                                        }
-                                    }
-                                }}
-                            >
-                                Habilitar
-                            </button>
-                        </div>
-                    ))}
-
-                    <div className="messages" ref={messagesComponent}>
+                    <RoomButtons />
+                    <div className="messages" ref={ElementMessages}>
                         {messages &&
                             messages.map((msg) => {
-                                if (msg.authorId === id) {
+                                if (msg.author_id === id) {
                                     return (
-                                        <div className="message" key={uuidv4()}>
-                                            <div className="user">{username}</div>
-                                            <div className="content">{msg.content}</div>
-                                            <span>{format(msg.createdTimestamp, "dd/MM/yyyy HH:mm:ss")}</span>
+                                        <div className="message-container" key={uuidv4()}>
+                                            <div className="username">{msg.author_name}</div>
+                                            <div className="message">{msg.content}</div>
+                                            <span>{format(msg.created_at, "dd/MM/yyyy HH:mm:ss")}</span>
                                         </div>
                                     );
                                 } else {
                                     return (
-                                        <div className="message right" key={uuidv4()}>
-                                            <div className="user">{currentUsername}</div>
-                                            <div className="content">{msg.content}</div>
-                                            <span>{format(msg.createdTimestamp, "dd/MM/yyyy HH:mm:ss")}</span>
+                                        <div className="message-container right" key={uuidv4()}>
+                                            <div className="username">{msg.author_name}</div>
+                                            <div className="message">{msg.content}</div>
+                                            <span>{format(msg.created_at, "dd/MM/yyyy HH:mm:ss")}</span>
                                         </div>
                                     );
                                 }
@@ -168,8 +80,7 @@ export default function Home() {
                             placeholder="Digite a mensagem que deseja enviar"
                             name="message"
                             type="text"
-                            onChange={(e) => setInputValue(e.target.value)}
-                            ref={input}
+                            ref={ElementInput}
                         />
                         <button className="btn-active" type="submit">
                             Enviar
@@ -189,3 +100,12 @@ export default function Home() {
         </div>
     );
 }
+
+export const getServerSideProps: GetServerSideProps<HomeProps> = async (context) => {
+    const response = await fetchRooms();
+
+    const { allRooms } = response.data;
+    return {
+        props: { allRooms },
+    };
+};

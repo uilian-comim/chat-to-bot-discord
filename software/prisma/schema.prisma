@@ -11,9 +11,8 @@ datasource db {
 }
 
 model Bot {
-  id        String @id @default(uuid())
-  token     String
-  client_id String
+  id    String @id @default(uuid())
+  token String
 }
 
 model DMChannels {

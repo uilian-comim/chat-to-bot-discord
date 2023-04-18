@@ -2,7 +2,7 @@ import { IGetResponse, IRoom } from "@/interfaces";
 import axios, { AxiosResponse } from "axios";
 
 interface IFetchRooms extends IGetResponse {
-    fullRooms: Array<IRoom>;
+    allRooms: Array<IRoom>;
 }
 
 export async function fetchRooms(): Promise<AxiosResponse<IFetchRooms>> {

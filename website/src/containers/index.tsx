@@ -1,5 +1,6 @@
 import { ReactNode } from "react";
 import BotProvider from "./Bot";
+import ComponentsRefProvider from "./ComponentsRef";
 import SocketProvider from "./Socket";
 
 interface ContainersProps {
@@ -8,8 +9,10 @@ interface ContainersProps {
 
 export default function ContextProviders({ children }: ContainersProps) {
     return (
-        <SocketProvider>
-            <BotProvider>{children}</BotProvider>
-        </SocketProvider>
+        <ComponentsRefProvider>
+            <SocketProvider>
+                <BotProvider>{children}</BotProvider>
+            </SocketProvider>
+        </ComponentsRefProvider>
     );
 }
