@@ -12,7 +12,7 @@ interface IRoom {
 
 interface IMessage {
     content: string;
-    created_at: number;
+    created_at: string;
     author_id: string;
     author_name: string;
 }

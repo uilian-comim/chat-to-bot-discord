@@ -10,9 +10,9 @@ interface ContainersProps {
 export default function ContextProviders({ children }: ContainersProps) {
     return (
         <ComponentsRefProvider>
-            <SocketProvider>
-                <BotProvider>{children}</BotProvider>
-            </SocketProvider>
+            <BotProvider>
+                <SocketProvider>{children}</SocketProvider>
+            </BotProvider>
         </ComponentsRefProvider>
     );
 }

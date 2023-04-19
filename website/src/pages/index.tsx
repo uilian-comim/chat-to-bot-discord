@@ -4,7 +4,6 @@ import { useBot, useComponentsRef, useSocket } from "@/contexts";
 import { IRoom } from "@/interfaces";
 import { fetchRooms } from "@/services";
 import { updateDOM } from "@/utils";
-import { format } from "date-fns";
 import { GetServerSideProps } from "next";
 import Head from "next/head";
 import { Notify } from "notiflix";
@@ -61,7 +60,7 @@ export default function Home({ allRooms }: HomeProps) {
                                         <div className="message-container" key={uuidv4()}>
                                             <div className="username">{msg.author_name}</div>
                                             <div className="message">{msg.content}</div>
-                                            <span>{format(msg.created_at, "dd/MM/yyyy HH:mm:ss")}</span>
+                                            <span>{msg.created_at}</span>
                                         </div>
                                     );
                                 } else {
@@ -69,7 +68,7 @@ export default function Home({ allRooms }: HomeProps) {
                                         <div className="message-container right" key={uuidv4()}>
                                             <div className="username">{msg.author_name}</div>
                                             <div className="message">{msg.content}</div>
-                                            <span>{format(msg.created_at, "dd/MM/yyyy HH:mm:ss")}</span>
+                                            <span>{msg.created_at}</span>
                                         </div>
                                     );
                                 }

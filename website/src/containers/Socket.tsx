@@ -1,11 +1,13 @@
-import { SocketContext, useComponentsRef } from "@/contexts";
+import { SocketContext, useBot, useComponentsRef } from "@/contexts";
 import { ContainerProps, IMessage, IRoom, ISendMessage } from "@/interfaces";
+import { format } from "date-fns";
 import { useEffect, useMemo, useState } from "react";
 import { io } from "socket.io-client";
 const socket = io("http://localhost:3333");
 
 export default function SocketProvider({ children }: ContainerProps) {
-    const { ElementMessages, ElementInput } = useComponentsRef();
+    const { ElementMessages } = useComponentsRef();
+    const { id, username } = useBot();
     const [message, setMessage] = useState<IMessage | null>(null);
     const [rooms, setRooms] = useState<Array<IRoom>>([]);
     const [currentRoom, setRoom] = useState<IRoom | null>(null);
@@ -52,7 +54,16 @@ export default function SocketProvider({ children }: ContainerProps) {
     });
 
     function SendMessage(props: ISendMessage) {
+        console.log(id);
         if (currentRoom) {
+            const newMessages = [...messages];
+            newMessages.push({
+                author_id: id as string,
+                author_name: username as string,
+                content: props.message,
+                created_at: format(new Date(), "dd/MM/yyyy HH:mm:ss"),
+            });
+            setMessages(newMessages);
             socket.emit("message", { ...props, room: currentRoom.id });
         }
     }

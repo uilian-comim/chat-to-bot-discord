@@ -42,7 +42,7 @@ function updateDOM({ input, localhost, message, messagesComponent, username }: I
         const DateElement = document.createElement("span");
         UserElement.textContent = message.author_name;
         MessageElement.textContent = message.content;
-        DateElement.textContent = format(message.created_at, "dd/MM/yyyy HH:mm:ss");
+        DateElement.textContent = message.created_at;
 
         MessageContainer.setAttribute("class", "message-container right");
         UserElement.setAttribute("class", "username");
