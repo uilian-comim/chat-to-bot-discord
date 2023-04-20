@@ -10,6 +10,16 @@
 yarn | npm install
 ```
 
+## How To Use
+
+```
+Na página de desenvolvedor do site oficial do discord, crie uma aplicação bot e salve o token.
+Após a criação do banco de dados com as tabelas necessárias, adicione na tabela "Bot" o token do bot.
+Na página de desenvolvedor do site oficial do discord, crie uma aplicação bot e salve o token.
+Após a criação do banco de dados com as tabelas necessárias, adicione na tabela "Bot" o token do bot.
+Feito isso, basta dar um yarn dev na pasta "Software" e na pasta "Website".
+```
+
 ## Author
 
 👤 **Uilian Comim**
